@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>رِفعة | مساعد DevOps عربي</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+    :root {
+      --bg: #09111f;
+      --panel: #101a2b;
+      --panel-2: #0d1727;
+      --panel-3: #162237;
+      --line: #22314a;
+      --text: #eef5ff;
+      --muted: #8fa1bb;
+      --faint: #5d6c84;
+      --blue: #72a7ff;
+      --cyan: #69e3d2;
+      --green: #6bd49a;
+      --amber: #f3c76b;
+      --red: #f17f8a;
+      --shadow: 0 22px 70px rgba(0,0,0,.24);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Cairo, Tahoma, sans-serif; min-height: 100vh; }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .app { min-height: 100vh; display: grid; grid-template-rows: 72px 1fr; background: radial-gradient(circle at 75% -15%, #1a3156 0, transparent 35%), var(--bg); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; border-bottom: 1px solid var(--line); background: rgba(9,17,31,.78); backdrop-filter: blur(18px); position: sticky; top: 0; z-index: 4; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 210px; }
+    .brand-mark { width: 35px; height: 35px; border-radius: 12px; background: linear-gradient(145deg, #85f1df, #507df1); color: #071321; display: grid; place-items: center; font-weight: 800; box-shadow: 0 8px 24px rgba(105,227,210,.2); }
+    .brand-name { font-weight: 800; letter-spacing: -.5px; font-size: 17px; }
+    .brand-sub { display: block; color: var(--muted); font-size: 10px; font-weight: 500; margin-top: -4px; }
+    .top-actions { display: flex; align-items: center; gap: 18px; }
+    .connection { display: flex; gap: 7px; align-items: center; color: var(--muted); font-size: 12px; }
+    .dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; box-shadow: 0 0 0 4px rgba(107,212,154,.1); }
+    .icon-btn { width: 35px; height: 35px; color: var(--muted); background: transparent; border: 1px solid transparent; border-radius: 10px; font-size: 18px; }
+    .icon-btn:hover { border-color: var(--line); color: var(--text); background: var(--panel-2); }
+    .avatar { width: 33px; height: 33px; border-radius: 50%; display: grid; place-items: center; color: #051322; background: linear-gradient(135deg,#f4d17a,#ef9b87); font-size: 12px; font-weight: 800; }
+    .workspace { display: grid; grid-template-columns: 282px minmax(0,1fr) 238px; min-height: 0; direction: ltr; }
+    .sidebar, .inspector { direction: rtl; background: rgba(12,22,38,.72); }
+    .sidebar { grid-column: 3; grid-row: 1; border-left: 1px solid var(--line); padding: 22px 16px; }
+    .inspector { grid-column: 1; grid-row: 1; border-right: 1px solid var(--line); padding: 22px 15px; }
+    .main { grid-column: 2; grid-row: 1; direction: rtl; min-width: 0; padding: 24px 30px 34px; overflow: auto; }
+    .section-label { color: var(--faint); font-size: 10px; font-weight: 700; letter-spacing: .08em; margin: 8px 12px 10px; }
+    .nav { display: grid; gap: 4px; }
+    .nav-item { display: flex; gap: 11px; align-items: center; width: 100%; padding: 10px 12px; border: 0; border-radius: 11px; color: var(--muted); background: transparent; text-align: right; font-size: 13px; transition: .2s; }
+    .nav-item:hover, .nav-item.active { color: var(--text); background: var(--panel-3); }
+    .nav-item.active { box-shadow: inset -2px 0 var(--cyan); }
+    .nav-icon { width: 19px; text-align: center; color: var(--faint); font-size: 16px; }
+    .nav-item.active .nav-icon { color: var(--cyan); }
+    .nav-count { margin-right: auto; padding: 1px 7px; color: var(--blue); background: rgba(114,167,255,.1); border-radius: 20px; font-size: 10px; }
+    .sidebar-bottom { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .workspace-card { padding: 13px; background: linear-gradient(135deg, rgba(114,167,255,.1), rgba(105,227,210,.04)); border: 1px solid #284568; border-radius: 13px; }
+    .workspace-card strong { display: block; font-size: 12px; margin-bottom: 3px; }
+    .workspace-card span { color: var(--muted); font-size: 10px; }
+    .workspace-card .repo-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); margin-left: 5px; }
+    .context-strip { display: flex; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+    .eyebrow { color: var(--cyan); font-size: 11px; font-weight: 700; margin-bottom: 5px; }
+    h1 { margin: 0; font-size: 25px; letter-spacing: -.8px; }
+    .context-copy { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .branch-pill, .tag { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); background: rgba(114,167,255,.09); border: 1px solid rgba(114,167,255,.18); border-radius: 8px; padding: 6px 9px; font-size: 11px; }
+    .header-buttons { display: flex; gap: 8px; }
+    .ghost, .primary { border: 1px solid var(--line); color: var(--text); border-radius: 9px; padding: 8px 13px; font-size: 11px; background: var(--panel-2); }
+    .ghost:hover { border-color: var(--blue); }
+    .primary { border-color: transparent; background: linear-gradient(135deg,#678ff4,#61cfc5); color: #071421; font-weight: 800; }
+    .primary:hover { filter: brightness(1.1); }
+    .chat-wrap { max-width: 920px; margin: 0 auto; }
+    .welcome { padding: 29px 0 19px; }
+    .welcome h2 { margin: 0 0 6px; font-size: 18px; }
+    .welcome p { margin: 0; color: var(--muted); font-size: 12px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; padding: 13px 0 21px; }
+    .chip { border: 1px solid var(--line); background: rgba(16,26,43,.7); color: var(--muted); border-radius: 20px; padding: 7px 11px; font-size: 11px; }
+    .chip:hover { color: var(--text); border-color: #42648f; background: var(--panel-3); }
+    .message { display: flex; gap: 11px; margin: 17px 0; align-items: flex-start; }
+    .message.user { flex-direction: row-reverse; }
+    .mini-avatar { flex: 0 0 29px; height: 29px; border-radius: 9px; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+    .agent-avatar { color: #091b27; background: linear-gradient(135deg,#78e7d0,#6e92f4); }
+    .user-avatar { color: #15100a; background: #e8bf7a; }
+    .bubble { max-width: 78%; padding: 12px 14px; color: #dfe9f8; background: var(--panel); border: 1px solid var(--line); border-radius: 13px 3px 13px 13px; font-size: 12px; line-height: 1.8; }
+    .user .bubble { background: #182946; border-color: #2c466e; border-radius: 3px 13px 13px 13px; }
+    .bubble p { margin: 0; }
+    .message-time { color: var(--faint); font-size: 9px; margin-top: 5px; }
+    .plan-card { margin: 18px 0 22px; border: 1px solid #2a4963; border-radius: 15px; background: linear-gradient(135deg,rgba(22,44,65,.8),rgba(16,26,43,.8)); overflow: hidden; }
+    .plan-head { display: flex; justify-content: space-between; align-items: center; padding: 13px 15px; border-bottom: 1px solid #28445c; }
+    .plan-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; }
+    .plan-title .spark { color: var(--cyan); font-size: 16px; }
+    .status { display: inline-flex; align-items: center; gap: 6px; color: var(--amber); font-size: 10px; }
+    .status .dot { background: var(--amber); box-shadow: none; }
+    .steps { padding: 7px 15px 13px; }
+    .step { display: flex; align-items: center; gap: 10px; padding: 9px 0; color: var(--muted); font-size: 11px; border-bottom: 1px solid rgba(34,49,74,.55); }
+    .step:last-child { border-bottom: 0; }
+    .step-num { width: 19px; height: 19px; display: grid; place-items: center; border-radius: 50%; background: var(--panel-3); color: var(--faint); font-size: 9px; }
+    .step.done { color: #c7f3de; }
+    .step.done .step-num { color: #071921; background: var(--green); }
+    .step.active { color: var(--text); }
+    .step.active .step-num { color: #071921; background: var(--cyan); box-shadow: 0 0 0 4px rgba(105,227,210,.1); }
+    .plan-foot { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(7,15,27,.28); }
+    .risk { color: var(--muted); font-size: 10px; }
+    .risk b { color: var(--amber); font-weight: 600; }
+    .composer { position: sticky; bottom: 0; padding-top: 10px; background: linear-gradient(transparent,var(--bg) 18%); }
+    .composer-box { border: 1px solid #2a4264; background: #101c30; border-radius: 14px; padding: 9px 11px; box-shadow: var(--shadow); }
+    .composer textarea { display: block; width: 100%; min-height: 46px; resize: none; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 12px; line-height: 1.7; }
+    .composer textarea::placeholder { color: var(--faint); }
+    .composer-actions { display: flex; align-items: center; justify-content: space-between; padding-top: 5px; }
+    .tool-actions { display: flex; gap: 3px; }
+    .tool-actions button { border: 0; background: transparent; color: var(--faint); font-size: 16px; padding: 4px 7px; border-radius: 7px; }
+    .tool-actions button:hover { color: var(--text); background: var(--panel-3); }
+    .send { border: 0; background: var(--cyan); color: #06201f; padding: 7px 13px; border-radius: 8px; font-size: 11px; font-weight: 800; }
+    .send:hover { filter: brightness(1.1); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">ر</div>
+        <div><span class="brand-name">رِفعة</span><span class="brand-sub">Arabic Engineering Copilot</span></div>
+      </div>
+      <div class="top-actions">
+        <div class="connection"><span class="dot"></span> <span id="connection-label">وضع العرض · Backend غير متصل</span></div>
+        <button class="icon-btn" aria-label="الإشعارات">♧</button>
+        <button class="icon-btn" aria-label="الإعدادات">⚙</button>
+        <div class="avatar">م</div>
+      </div>
+    </header>
+    <div class="workspace">
+      <aside class="sidebar">
+        <div class="section-label">مساحة العمل</div>
+        <nav class="nav">
+          <button class="nav-item active" data-view="المحادثة"><span class="nav-icon">✦</span> المحادثة</button>
+          <button class="nav-item" data-view="المستودعات"><span class="nav-icon">◈</span> المستودعات <span class="nav-count">3</span></button>
+          <button class="nav-item" data-view="Pull Requests"><span class="nav-icon">⇄</span> Pull Requests <span class="nav-count">4</span></button>
+          <button class="nav-item" data-view="Actions"><span class="nav-icon">▷</span> Actions</button>
+          <button class="nav-item" data-view="Issues"><span class="nav-icon">⊙</span> Issues <span class="nav-count">8</span></button>
+          <button class="nav-item" data-view="Terminal"><span class="nav-icon">›_</span> Terminal</button>
+        </nav>
+        <div class="section-label" style="margin-top:26px">المتابعة</div>
+        <nav class="nav">
+          <button class="nav-item" data-view="العمليات"><span class="nav-icon">◴</span> العمليات <span class="nav-count">2</span></button>
+          <button class="nav-item" data-view="السجل"><span class="nav-icon">≡</span> سجل التدقيق</button>
+          <button class="nav-item" data-view="السياسات"><span class="nav-icon">⌘</span> السياسات</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="section-label" style="margin:0 0 10px">المشروع الحالي</div>
+          <div class="workspace-card"><strong><span class="repo-dot"></span> acme / storefront</strong><span>main · آخر مزامنة منذ 3 دقائق</span></div>
+        </div>
+      </aside>
+      <main class="main">
+        <div class="context-strip">
+          <div><div class="eyebrow">مساحة التطوير · نشطة</div><h1 id="view-title">المحادثة الهندسية</h1><div class="context-copy">أفهم طلبك، أضع خطة، ولا أنفذ التغييرات الحساسة دون موافقتك.</div></div>
+          <div class="header-buttons"><span class="branch-pill">⑂ main</span><button class="ghost" id="refresh">↻ مزامنة</button></div>
+        </div>
+        <div class="chat-wrap" id="chat-view">
+          <section class="welcome"><h2>مرحبًا، ماذا سننجز اليوم؟</h2><p>يمكنك الكتابة بالعربية أو استخدام أوامر Git وGitHub CLI. سأشرح كل خطوة قبل تنفيذها.</p></section>
+          <div class="chips">
+            <button class="chip">افحص حالة المستودع</button><button class="chip">اعرض آخر Pull Requests</button><button class="chip">شخّص فشل الـ CI</button><button class="chip">جهّز فرعًا لميزة جديدة</button>
+          </div>
+          <div class="message user"><div class="mini-avatar user-avatar">م</div><div><div class="bubble"><p>افحص آخر PR في المستودع، شوف هل الـ CI ناجح، ولو كل شيء سليم جهزني للدمج.</p></div><div class="message-time">الآن · تم الإرسال</div></div></div>
+          <div class="message"><div class="mini-avatar agent-avatar">ر</div><div style="min-width:0;flex:1"><div class="bubble"><p>حللت طلبك. وجدت <b style="color:var(--cyan)">PR #184 · تحسين جلسة تسجيل الدخول</b>، وحالته جاهزة للمراجعة. هذه خطة التحقق قبل الدمج:</p></div>
+            <div class="plan-card" id="plan-card">
+              <div class="plan-head"><div class="plan-title"><span class="spark">✦</span> خطة آمنة قبل الدمج <span class="tag">PR #184</span></div><div class="status"><span class="dot"></span><span id="plan-status">بانتظار موافقتك</span></div></div>
+              <div class="steps"><div class="step done"><span class="step-num">✓</span><span>قراءة تفاصيل Pull Request والفرع المستهدف</span></div><div class="step done"><span class="step-num">✓</span><span>التحقق من مراجعات الكود وحالة الحماية</span></div><div class="step active" id="step-check"><span class="step-num">3</span><span>متابعة فحوصات GitHub Actions — كل الفحوصات ناجحة</span></div><div class="step" id="step-merge"><span class="step-num">4</span><span>تجهيز الدمج بطريقة Squash إلى main</span></div></div>
+              <div class="plan-foot"><div class="risk">مستوى الخطورة: <b>مرتفع · تغيير على Remote</b></div><button class="primary" id="approve">موافقة وتجهيز الدمج</button></div>
+            </div>
+            <div class="message-time">منذ لحظات · تم التحقق عبر GitHub API</div></div></div>
+          <div class="composer"><div class="composer-box"><textarea id="prompt" placeholder="اكتب طلبك بالعربية... مثال: شغّل الاختبارات واشرح لي النتيجة"></textarea><div class="composer-actions"><div class="tool-actions"><button title="إرفاق">⊕</button><button title="أوامر مساعدة">⌘</button><button title="سياق المشروع">◈</button></div><button class="send" id="send">إرسال ↵</button></div></div></div>
+        </div>
+        <div id="terminal-view" hidden></div>
+      </main>
+      <aside class="inspector">
+        <div class="section-label">ملخص المشروع</div>
+        <div class="workspace-card" style="margin-bottom:18px"><strong><span class="repo-dot"></span> storefront</strong><span>acme / storefront · خاص</span><div style="margin-top:10px;display:flex;gap:5px;flex-wrap:wrap"><span class="tag">TypeScript</span><span class="tag">Vite</span></div></div>
+        <div class="section-label">حالة البيئة</div>
+        <div class="metric-grid"><div class="metric"><b>✓</b><span>البناء</span><strong>ناجح</strong></div><div class="metric"><b>87%</b><span>التغطية</span><strong>+4.2%</strong></div><div class="metric"><b>12</b><span>فحصًا</span><strong>ناجح</strong></div><div class="metric"><b>3</b><span>فروع نشطة</span><strong>مزامنة</strong></div></div>
+        <div class="section-label" style="margin-top:24px">آخر العمليات</div>
+        <div class="activity-list"><div class="activity"><span class="activity-icon green">✓</span><div><strong>فحص CI</strong><small>اكتمل منذ 4 دقائق</small></div></div><div class="activity"><span class="activity-icon blue">⑂</span><div><strong>تحديث الفرع</strong><small>main · منذ 18 دقيقة</small></div></div><div class="activity"><span class="activity-icon amber">!</span><div><strong>PR #184</strong><small>بانتظار إجراء</small></div></div></div>
+        <div class="policy-card"><div class="policy-head"><span>حماية العمليات</span><span class="dot"></span></div><p>الدفع والدمج يحتاجان موافقة صريحة.</p><button class="ghost" id="policies">عرض السياسات</button></div>
+      </aside>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="modal" id="modal" hidden><div class="modal-card"><div class="modal-icon">!</div><h3>موافقة مطلوبة</h3><p>هذه العملية ستجهّز دمج <b>PR #184</b> إلى الفرع المحمي <b>main</b>.</p><div class="command">gh pr merge 184 --squash --repo acme/storefront</div><div class="modal-meta"><span>التأثير: تحديث Remote</span><span>قابل للتراجع: نعم</span></div><div class="modal-actions"><button class="ghost" id="cancel-modal">إلغاء</button><button class="primary" id="confirm-modal">أوافق وأكمل</button></div></div></div>
+  <style>
+    .metric-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .metric { padding:10px; border:1px solid var(--line); border-radius:10px; background:var(--panel-2); }
+    .metric b { display:block; color:var(--green); font:700 14px 'IBM Plex Mono',monospace; }
+    .metric span,.metric strong { display:block; font-size:10px; color:var(--muted); margin-top:3px; }
+    .metric strong { color:var(--green); font-weight:600; }
+    .activity-list { display:grid; gap:3px; }
+    .activity { display:flex; gap:9px; align-items:center; padding:8px 5px; }
+    .activity-icon { width:20px; height:20px; display:grid; place-items:center; border-radius:6px; font-size:11px; background:rgba(107,212,154,.1); color:var(--green); }
+    .activity-icon.blue { color:var(--blue); background:rgba(114,167,255,.1); }
+    .activity-icon.amber { color:var(--amber); background:rgba(243,199,107,.1); }
+    .activity strong,.activity small { display:block; font-size:10px; }
+    .activity small { color:var(--faint); margin-top:2px; }
+    .policy-card { margin-top:25px; padding:12px; border:1px solid #3d3f38; background:rgba(243,199,107,.04); border-radius:11px; }
+    .policy-head { display:flex; justify-content:space-between; color:var(--amber); font-size:11px; font-weight:700; }
+    .policy-head .dot { width:6px; height:6px; background:var(--amber); box-shadow:none; }
+    .policy-card p { color:var(--muted); font-size:10px; line-height:1.6; margin:8px 0; }
+    .policy-card .ghost { width:100%; padding:6px; font-size:10px; }
+    .toast { position:fixed; left:50%; bottom:22px; transform:translate(-50%,20px); opacity:0; pointer-events:none; background:#d9f9ed; color:#0a2b25; padding:9px 15px; border-radius:9px; box-shadow:var(--shadow); font-size:11px; transition:.25s; z-index:9; }
+    .toast.show { transform:translate(-50%,0); opacity:1; }
+    .modal { position:fixed; inset:0; display:grid; place-items:center; background:rgba(2,8,16,.72); backdrop-filter:blur(8px); z-index:8; padding:20px; }
+    .modal[hidden] { display:none; }
+    .modal-card { width:min(430px,100%); padding:24px; background:#111c2e; border:1px solid #365274; border-radius:17px; box-shadow:0 30px 100px rgba(0,0,0,.48); text-align:right; }
+    .modal-icon { width:34px; height:34px; display:grid; place-items:center; border-radius:10px; color:#2d2107; background:var(--amber); font-weight:800; margin-bottom:12px; }
+    .modal h3 { margin:0 0 7px; font-size:17px; }
+    .modal p { color:var(--muted); font-size:11px; line-height:1.8; margin:0 0 15px; }
+    .command { direction:ltr; text-align:left; padding:11px; border:1px solid #2b4565; border-radius:8px; background:#091321; color:#a9cdfd; font:11px 'IBM Plex Mono',monospace; }
+    .modal-meta { display:flex; justify-content:space-between; color:var(--faint); font-size:10px; padding:11px 0 17px; }
+    .modal-actions { display:flex; gap:8px; justify-content:flex-start; }
+    .terminal-card { margin:28px auto; max-width:920px; overflow:hidden; border:1px solid var(--line); border-radius:14px; background:#07101d; box-shadow:var(--shadow); }
+    .terminal-head { display:flex; justify-content:space-between; padding:13px 16px; border-bottom:1px solid var(--line); color:var(--text); font-size:12px; }
+    .terminal-card pre { direction:ltr; text-align:left; margin:0; padding:22px; min-height:350px; color:#d4e1f3; font:12px/2 'IBM Plex Mono',monospace; overflow:auto; }
+    .terminal-card .muted { color:var(--faint); }
+    .terminal-card .green { color:var(--green); }
+    .terminal-card .blue { color:var(--blue); }
+    .cursor { color:var(--cyan); animation:blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity:0; } }
+    @media (max-width: 1050px) { .workspace { grid-template-columns: 220px minmax(0,1fr) 205px; } .main { padding:22px 20px; } }
+    @media (max-width: 820px) { .workspace { display:block; } .sidebar { display:none; } .inspector { display:none; } .topbar { padding:0 16px; } .connection { display:none; } .context-strip { gap:10px; } .context-strip .context-copy { max-width:390px; } }
+    @media (max-width: 520px) { .main { padding:18px 14px 25px; } h1 { font-size:20px; } .context-strip { align-items:flex-start; flex-direction:column; } .header-buttons { width:100%; justify-content:space-between; } .welcome { padding-top:22px; } .bubble { max-width:90%; } .plan-foot { align-items:flex-start; flex-direction:column; gap:11px; } .plan-foot .primary { width:100%; } }
+  </style>
+  <script>
+    const prompt = document.getElementById('prompt');
+    const toast = document.getElementById('toast');
+    const modal = document.getElementById('modal');
+    const chatView = document.getElementById('chat-view');
+    const title = document.getElementById('view-title');
+    const originalTitle = title.textContent;
+    let backendOnline = false;
+    let activePlanId = null;
+    let activeApprovalId = null;
+
+    async function createBackendPlan(message) {
+      if (!backendOnline) return null;
+      const response = await fetch('/api/plan', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ message, repository: 'acme/storefront', prNumber: 184 })
+      });
+      if (!response.ok) throw new Error('تعذر إنشاء الخطة عبر الخادم');
+      const plan = await response.json();
+      activePlanId = plan.id;
+      activeApprovalId = plan.approvalId || null;
+      return plan;
+    }
+
+    async function bootstrapBackend() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 1200);
+      try {
+        const response = await fetch('/api/health', { signal: controller.signal });
+        if (!response.ok) throw new Error('offline');
+        const health = await response.json();
+        backendOnline = true;
+        document.getElementById('connection-label').textContent = health.githubConfigured ? 'Backend + GitHub متصلان' : 'Backend متصل · GitHub يحتاج إعدادًا';
+        document.querySelector('.connection .dot').style.background = health.githubConfigured ? 'var(--green)' : 'var(--amber)';
+        await createBackendPlan('افحص آخر PR في المستودع، شوف هل الـ CI ناجح، ولو كل شيء سليم جهزني للدمج.');
+      } catch {
+        document.getElementById('connection-label').textContent = 'وضع العرض · Backend غير متصل';
+        document.querySelector('.connection .dot').style.background = 'var(--amber)';
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    function notify(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    function addMessage(text) {
+      const row = document.createElement('div');
+      row.className = 'message user';
+      row.innerHTML = '<div class="mini-avatar user-avatar">م</div><div><div class="bubble"><p></p></div><div class="message-time">الآن · تم الإرسال</div></div>';
+      row.querySelector('p').textContent = text;
+      chatView.querySelector('.composer').before(row);
+      createBackendPlan(text).catch(() => notify('تعذر إرسال الخطة إلى Backend'));
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = 'message';
+        reply.innerHTML = '<div class="mini-avatar agent-avatar">ر</div><div><div class="bubble"><p>فهمت طلبك. سأبدأ بقراءة السياق والتحقق من حالة المشروع، ثم أعرض لك خطة واضحة قبل أي تغيير.</p></div><div class="message-time">الآن · تحليل الطلب</div></div>';
+        chatView.querySelector('.composer').before(reply);
+        notify('تم إنشاء خطة آمنة للطلب');
+      }, 650);
+    }
+
+    document.querySelectorAll('.chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        prompt.value = chip.textContent;
+        prompt.focus();
+      });
+    });
+
+    document.getElementById('send').addEventListener('click', () => {
+      const value = prompt.value.trim();
+      if (!value) { prompt.focus(); notify('اكتب طلبًا أولًا'); return; }
+      addMessage(value);
+      prompt.value = '';
+    });
+
+    prompt.addEventListener('keydown', (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') document.getElementById('send').click();
+    });
+
+    document.querySelectorAll('.nav-item').forEach((item) => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach((nav) => nav.classList.remove('active'));
+        item.classList.add('active');
+        const view = item.dataset.view;
+        title.textContent = view === 'المحادثة' ? originalTitle : view;
+        if (view === 'Terminal') {
+          chatView.hidden = true;
+          document.getElementById('terminal-view').hidden = false;
+          document.getElementById('terminal-view').innerHTML = `<div class="terminal-card"><div class="terminal-head"><span>طرفية المشروع</span><span class="status"><span class="dot"></span> جاهزة</span></div><pre><span class="muted">$</span> git status
+<span class="green">On branch main</span>
+Your branch is up to date with <span class="blue">origin/main</span>.
+
+<span class="muted">$</span> gh run list --limit 3
+<span class="green">✓</span> CI / test   <span class="muted">success · 4m ago</span>
+<span class="green">✓</span> CI / build  <span class="muted">success · 4m ago</span>
+
+<span class="muted">$</span> <span class="cursor">▌</span></pre></div>`;
+        } else {
+          chatView.hidden = false;
+          document.getElementById('terminal-view').hidden = true;
+          if (view !== 'المحادثة') notify('هذا القسم متاح في مساحة العمل التجريبية');
+        }
+      });
+    });
+
+    document.getElementById('approve').addEventListener('click', () => { modal.hidden = false; });
+    document.getElementById('cancel-modal').addEventListener('click', () => { modal.hidden = true; });
+    document.getElementById('confirm-modal').addEventListener('click', async () => {
+      modal.hidden = true;
+      if (backendOnline && activePlanId) {
+        try {
+          if (!activeApprovalId) throw new Error('لا توجد موافقة صالحة مرتبطة بالخطة');
+          const response = await fetch(`/api/approvals/${activeApprovalId}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ approved: true }) });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'رفضت السياسة العملية');
+          finishMergeUI();
+          notify('اكتملت العملية فعليًا عبر GitHub API');
+        } catch (error) {
+          document.getElementById('plan-status').textContent = 'مرفوض من السياسة';
+          notify(error.message);
+        }
+        return;
+      }
+      finishMergeUI();
+    });
+
+    function finishMergeUI() {
+      const status = document.getElementById('plan-status');
+      status.textContent = 'تمت الموافقة · قيد التنفيذ';
+      status.parentElement.style.color = 'var(--cyan)';
+      document.getElementById('step-check').classList.remove('active');
+      document.getElementById('step-check').classList.add('done');
+      document.getElementById('step-check').querySelector('.step-num').textContent = '✓';
+      document.getElementById('step-merge').classList.add('active');
+      document.getElementById('step-merge').querySelector('.step-num').textContent = '…';
+      document.getElementById('approve').textContent = 'جارٍ تجهيز الدمج...';
+      document.getElementById('approve').disabled = true;
+      notify('تم تسجيل الموافقة وبدء العملية');
+      setTimeout(() => {
+        document.getElementById('step-merge').classList.remove('active');
+        document.getElementById('step-merge').classList.add('done');
+        document.getElementById('step-merge').querySelector('.step-num').textContent = '✓';
+        status.textContent = 'اكتمل بنجاح';
+        document.getElementById('approve').textContent = 'تم تجهيز الدمج';
+        notify('اكتملت العملية بنجاح · PR #184 جاهز للدمج');
+      }, 1400);
+    }
+
+    document.getElementById('refresh').addEventListener('click', () => notify('تمت مزامنة حالة GitHub الآن'));
+    document.getElementById('policies').addEventListener('click', () => notify('السياسات: الدفع والدمج يحتاجان موافقة صريحة'));
+    modal.addEventListener('click', (event) => { if (event.target === modal) modal.hidden = true; });
+    bootstrapBackend();
+  </script>
+</body>
+</html>
