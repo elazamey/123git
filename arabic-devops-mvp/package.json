@@ -1,0 +1,13 @@
+{
+  "name": "arabic-devops-agent-mvp",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node smoke-test.mjs",
+    "test:real": "node real-github-e2e.mjs --execute"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
